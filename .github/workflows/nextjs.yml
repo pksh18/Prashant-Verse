@@ -6,8 +6,7 @@ name: Deploy Next.js site to Pages
 
 on:
   # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+  # Cloudflare is the production deployment. This static Pages template is manual only.
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

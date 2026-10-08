@@ -5,6 +5,8 @@ This repository supports an independent Cloudflare Workers deployment. The exist
 - Build command: `npm run build:cloudflare`
 - Deploy command: `npm run deploy:cloudflare`
 - Production branch: `main`
+- Public website: https://prashant-verse.prashant94580.workers.dev
+- Automated deployment: `.github/workflows/cloudflare.yml`, with `CLOUDFLARE_API_TOKEN` configured as an encrypted GitHub Actions repository secret. The default GitHub Pages template is manual only because the full app needs a backend.
 - Worker name: `prashant-verse`
 - D1 binding: `DB`, configured in `wrangler.jsonc`
 - Node.js: 22.13 or newer
