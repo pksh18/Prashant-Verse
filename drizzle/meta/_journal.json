@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790866297539,
+      "tag": "0000_happy_alex_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790906762059,
+      "tag": "0001_nasty_sleeper",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791007106581,
+      "tag": "0002_violet_ikaris",
+      "breakpoints": true
+    }
+  ]
+}

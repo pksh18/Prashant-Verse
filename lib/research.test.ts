@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {parseStats,parseResearchCsv,companyUrl} from './research.ts';
+test('24h movement and relative volume use exchange fields and base units',()=>{const a=parseStats({open:'100',last:'110',high:'120',low:'90',volume:'200',volume_30day:'3000'},123);assert.ok(Math.abs(a.change-10)<1e-10);assert.equal(a.relativeVolume,2);assert.equal(a.volume,200);assert.equal(a.fetchedAt,123);assert.equal(parseStats({open:'100',last:'90',high:'120',low:'90',volume:'0'},1).relativeVolume,null)});
+test('invalid exchange stats do not become zero-price research',()=>{for(const v of [{},{open:'0',last:'100',high:'110',low:'90',volume:'20'},{open:'100',last:'NaN',high:'110',low:'90',volume:'20'}])assert.throws(()=>parseStats(v,1))});
+test('CSV imports handle BOM, CRLF, quoted commas, escaped quotes and multiline cells',()=>{const csv=parseResearchCsv('\uFEFFName,P/E,Notes\r\n"Example, Ltd",20,"a ""quote""\nline"\r\nOther,,none');assert.equal(csv.rows.length,2);assert.equal(csv.headers[0],'Name');assert.equal(csv.rows[0][0],'Example, Ltd');assert.equal(csv.rows[0][2],'a "quote"\nline');assert.equal(csv.rows[1][1],'')});
+test('malformed CSV, missing company headers and oversized imports are rejected',()=>{for(const csv of ['Name,PE\n"broken,20','Price,PE\n100,20','Name,PE\nCompany,20,extra','Name\n'+'a'.repeat(2000000)])assert.throws(()=>parseResearchCsv(csv))});
+test('company research links stay on Screener and safely encode symbols',()=>{assert.equal(companyUrl('tcs'),'https://www.screener.in/company/TCS/consolidated/');assert.equal(companyUrl('M&M'),'https://www.screener.in/company/M%26M/consolidated/');assert.equal(companyUrl('https://evil.com'),null)});

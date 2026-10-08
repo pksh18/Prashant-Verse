@@ -1,0 +1,8 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {evaluateValue} from './value-research.ts';
+const now=Date.parse('2026-10-04T12:00:00Z'),headers=['Name','P/E','Industry PE','ROE','ROCE','Debt to equity','Sales growth 3Years','Profit growth 3Years','Sector'],row=['Example','16','20','12','15','0.5','5','5','Manufacturing'];
+const run=(r=row,date='2026-10-04')=>evaluateValue({headers,rows:[r]},date,now)[0];
+test('all checks and current source date generate an explained candidate',()=>{assert.equal(run().status,'Research candidate');assert.equal(run().passed,6);assert.ok(Math.abs(run().discount!-20)<1e-8)});
+test('missing values cannot pass; loss makers and high debt fail',()=>{for(const [i,value] of [[1,'-1'],[5,'0.6']] as const){const r=[...row];r[i]=value;assert.equal(run(r).status,'Does not pass')}const r=[...row];r[5]='';assert.equal(run(r).status,'Incomplete data');assert.equal(run(r).passed,5)});
+test('date missing, stale, future or impossible cannot create candidate',()=>{for(const date of ['','2026-08-01','2026-10-05','2026-02-30'])assert.equal(run(row,date).status,'Check snapshot date')});
+test('financial companies are sent to a separate model',()=>{const r=[...row];r[8]='Banking';assert.equal(run(r).status,'Separate sector model')});
+test('candidate ordering prioritises complete candidates; absent headers remain unknown',()=>{const r=[...row];r[1]='25';const result=evaluateValue({headers,rows:[r,row]},'2026-10-04',now);assert.equal(result[0].status,'Research candidate');assert.equal(evaluateValue({headers:['Name'],rows:[['Missing metrics']]},'2026-10-04',now)[0].status,'Incomplete data')});

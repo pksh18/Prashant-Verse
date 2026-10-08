@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-10-03T14:55:59.273Z",
+  "source": "Kraken public one-minute OHLCV: ten crypto USD pairs",
+  "start": "2026-10-03T04:55:00.000Z",
+  "split": "2026-10-03T08:54:00.000Z",
+  "end": "2026-10-03T14:54:00.000Z",
+  "assumptions": "Fixed existing presets, no tuning. $100,000 capital, $5,000 allocations, 5 positions, $1,000 daily equity loss trigger, $5 roundtrip fee, 0.05% adverse slippage each side. Actual engine with 1.5R protected stop and 2R target. Next-bar open entries, completed candles only, stop-first and conservative retrace ordering on ambiguous candles. Daily and time exits apply. Drawdown sampled at replay updates. No spread, liquidity, tax, latency or outages model. Approximately twelve hours of minute data; exploratory diagnostic only, not independent validation or evidence of a lasting edge.",
+  "excluded": [
+    "Gold and forex: no matching history"
+  ],
+  "results": [
+    {
+      "id": "momentum-alpha",
+      "name": "Momentum Alpha · experimental",
+      "firstPeriod": {
+        "closed": 0,
+        "wins": 0,
+        "winRate": null,
+        "net": 0,
+        "fees": 0,
+        "profitFactor": null,
+        "maxObservedDrawdown": 0,
+        "maxPositions": 0
+      },
+      "secondPeriod": {
+        "closed": 1,
+        "wins": 0,
+        "winRate": 0,
+        "net": -27.49000000000524,
+        "fees": 5,
+        "profitFactor": 0,
+        "maxObservedDrawdown": 27.49000000000524,
+        "maxPositions": 1
+      }
+    }
+  ],
+  "meetsRequestedWinRate": false
+}

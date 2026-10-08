@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2026-10-03T12:24:34.576Z",
+  "source": "Saved Coinbase Exchange five-minute OHLCV: ten crypto USD pairs",
+  "start": "2026-09-26T01:00:00.000Z",
+  "split": "2026-09-29T00:00:00.000Z",
+  "end": "2026-10-02T00:00:00.000Z",
+  "assumptions": "Fixed existing presets, no tuning. $100,000 capital, $5,000 allocations, 5 positions, $1,000 daily equity loss trigger, $5 roundtrip fee, 0.05% adverse slippage each side. Actual engine with 1.5R protected stop and 2R target. Next-bar open entries, completed candles only, stop-first and conservative retrace ordering on ambiguous candles. Daily and time exits apply. Drawdown sampled at replay updates. No spread, liquidity, tax, latency or outages model. Only seven days of already-used data; this is a diagnostic comparison, not independent validation.",
+  "excluded": [
+    "One-minute supply/demand: no one-minute history",
+    "Gold and forex: no matching history"
+  ],
+  "results": [
+    {
+      "id": "trend-pullback-v2",
+      "name": "Trend & pullback V2",
+      "firstPeriod": {
+        "closed": 85,
+        "wins": 12,
+        "winRate": 14.117647058823529,
+        "net": -2069.1258964248846,
+        "fees": 425,
+        "profitFactor": 0.11823547567233189,
+        "maxObservedDrawdown": 2127.526085143094,
+        "maxPositions": 5
+      },
+      "secondPeriod": {
+        "closed": 129,
+        "wins": 28,
+        "winRate": 21.705426356589147,
+        "net": -2409.207401589272,
+        "fees": 645,
+        "profitFactor": 0.14618132921740307,
+        "maxObservedDrawdown": 2427.397578718752,
+        "maxPositions": 5
+      }
+    },
+    {
+      "id": "ema-9-15",
+      "name": "9/15 EMA crossover",
+      "firstPeriod": {
+        "closed": 114,
+        "wins": 38,
+        "winRate": 33.33333333333333,
+        "net": -1663.4128148998134,
+        "fees": 570,
+        "profitFactor": 0.2920663891097284,
+        "maxObservedDrawdown": 1727.7841777715657,
+        "maxPositions": 5
+      },
+      "secondPeriod": {
+        "closed": 128,
+        "wins": 38,
+        "winRate": 29.6875,
+        "net": -2133.949529745252,
+        "fees": 640,
+        "profitFactor": 0.22219944409826983,
+        "maxObservedDrawdown": 2276.2303815872583,
+        "maxPositions": 5
+      }
+    },
+    {
+      "id": "liquidity-sweep",
+      "name": "Liquidity sweep",
+      "firstPeriod": {
+        "closed": 76,
+        "wins": 20,
+        "winRate": 26.31578947368421,
+        "net": -1626.2972897474974,
+        "fees": 380,
+        "profitFactor": 0.2144946304935409,
+        "maxObservedDrawdown": 1771.9065212170535,
+        "maxPositions": 5
+      },
+      "secondPeriod": {
+        "closed": 101,
+        "wins": 36,
+        "winRate": 35.64356435643564,
+        "net": -1256.6265249255812,
+        "fees": 505,
+        "profitFactor": 0.3984227730735159,
+        "maxObservedDrawdown": 1571.4796937260107,
+        "maxPositions": 5
+      }
+    },
+    {
+      "id": "golden-trio",
+      "name": "Golden Trio \u00b7 EMA 50/200",
+      "firstPeriod": {
+        "closed": 36,
+        "wins": 10,
+        "winRate": 27.77777777777778,
+        "net": -623.8094225542736,
+        "fees": 180,
+        "profitFactor": 0.19877088979360152,
+        "maxObservedDrawdown": 677.3350678255665,
+        "maxPositions": 5
+      },
+      "secondPeriod": {
+        "closed": 54,
+        "wins": 13,
+        "winRate": 24.074074074074073,
+        "net": -1014.2121921568469,
+        "fees": 270,
+        "profitFactor": 0.2102942580734956,
+        "maxObservedDrawdown": 1157.5405928568507,
+        "maxPositions": 5
+      }
+    },
+    {
+      "id": "fibonacci",
+      "name": "Fibonacci retracement",
+      "firstPeriod": {
+        "closed": 95,
+        "wins": 22,
+        "winRate": 23.157894736842106,
+        "net": -2510.543478233434,
+        "fees": 475,
+        "profitFactor": 0.15217853878986323,
+        "maxObservedDrawdown": 2606.6055109529843,
+        "maxPositions": 5
+      },
+      "secondPeriod": {
+        "closed": 100,
+        "wins": 35,
+        "winRate": 35,
+        "net": -1307.8410474888224,
+        "fees": 500,
+        "profitFactor": 0.4318774408121035,
+        "maxObservedDrawdown": 1679.2635339653934,
+        "maxPositions": 5
+      }
+    }
+  ],
+  "meetsRequestedWinRate": false
+}

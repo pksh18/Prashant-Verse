@@ -1,0 +1,16 @@
+// Transparent research filters, not an intrinsic-value or return forecast.
+const aliases={name:['name','company','company name'],pe:['p/e','pe','price to earning','price to earnings','p/e ratio'],peer:['industry pe','industry p/e','sector pe','sector p/e'],roe:['roe','roe %','return on equity'],roce:['roce','roce %','return on capital employed'],debt:['debt to equity','debt/equity','debt to equity ratio'],sales:['sales growth 3years','sales growth 3 years','sales growth 3y'],profit:['profit growth 3years','profit growth 3 years','profit growth 3y'],sector:['sector','industry'],symbol:['symbol','nse code','nse symbol']} as const;
+export const VALUE_RULES=['Positive P/E at least 20% below imported sector / industry P/E','ROE ≥ 12% and ROCE ≥ 15%','Debt/equity between 0 and 0.5','Three-year sales and profit growth both ≥ 5%'];
+export function evaluateValue(csv:{headers:string[];rows:string[][]},asOf:string,now=Date.now()){
+ const normal=(s:string)=>s.trim().toLowerCase().replace(/\s+/g,' '),indices=Object.fromEntries(Object.entries(aliases).map(([k,a])=>[k,csv.headers.findIndex(h=>(a as readonly string[]).includes(normal(h)))])) as Record<keyof typeof aliases,number>;
+ const numeric=(s:string|undefined)=>{if(!s?.trim())return null;const clean=s.trim().replaceAll(',','').replace(/%$/,'');if(!/^-?\d+(\.\d+)?$/.test(clean))return null;const n=Number(clean);return Number.isFinite(n)?n:null};
+ const parsed=Date.parse(asOf+'T00:00:00Z'),dateValid=/^\d{4}-\d{2}-\d{2}$/.test(asOf)&&Number.isFinite(parsed)&&new Date(parsed).toISOString().slice(0,10)===asOf&&parsed<=now&&now-parsed<=31*86400000;
+ return csv.rows.map((row,index)=>{
+  const get=(key:keyof typeof aliases)=>indices[key]>=0?row[indices[key]]:undefined;
+  const pe=numeric(get('pe')),peer=numeric(get('peer')),roe=numeric(get('roe')),roce=numeric(get('roce')),debt=numeric(get('debt')),sales=numeric(get('sales')),profit=numeric(get('profit'));
+  const checks=[{label:'P/E vs industry',value:pe!==null&&peer!==null?`${pe} / ${peer}`:'Missing',pass:pe!==null&&peer!==null&&pe>0&&peer>0&&pe<=peer*.8,known:pe!==null&&peer!==null},{label:'ROE',value:roe===null?'Missing':roe+'%',pass:roe!==null&&roe>=12,known:roe!==null},{label:'ROCE',value:roce===null?'Missing':roce+'%',pass:roce!==null&&roce>=15,known:roce!==null},{label:'Debt/equity',value:debt===null?'Missing':String(debt),pass:debt!==null&&debt>=0&&debt<=.5,known:debt!==null},{label:'Sales growth · 3y',value:sales===null?'Missing':sales+'%',pass:sales!==null&&sales>=5,known:sales!==null},{label:'Profit growth · 3y',value:profit===null?'Missing':profit+'%',pass:profit!==null&&profit>=5,known:profit!==null}];
+  const financial=/bank|financ|insurance|nbfc/i.test(get('sector')??''),missing=checks.filter(c=>!c.known).map(c=>c.label),passed=checks.filter(c=>c.pass).length;
+  const status=financial?'Separate sector model':!dateValid?'Check snapshot date':missing.length?'Incomplete data':passed===checks.length?'Research candidate':'Does not pass';
+  return {index,name:get('name')??'Unnamed company',symbol:get('symbol'),sector:get('sector'),checks,passed,status,discount:pe!==null&&peer!==null&&pe>0&&peer>0?(1-pe/peer)*100:null};
+ }).sort((a,b)=>(b.status==='Research candidate'?1:0)-(a.status==='Research candidate'?1:0)||b.passed-a.passed||a.name.localeCompare(b.name));
+}

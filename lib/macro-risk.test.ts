@@ -1,0 +1,20 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {higherFrame,freshFrame,volatilityAnalysis} from './macro-risk.ts';
+import {entryPlan} from './entry-plan.ts';import {rankLiquidPairs} from './crypto-universe.ts';
+import {ensureTeam,evaluateTeam} from './decision-team.ts';import {initial,advance} from './paper-engine.ts';
+const now=Date.parse('2026-10-08T12:00:00Z');
+const frame={fetchedAt:now,barTime:now-3600000,trend:'BULLISH' as const,atr:.5,close:100};
+const a={barTime:now-300000,eligible:true,reason:'Qualified',score:1,stopFraction:.01,strategy:'trend-pullback-v2',direction:'long' as const,volumeRatio:1.5};
+function account(){const s=ensureTeam(initial());s.running=true;s.quotes=[{symbol:'ETH',price:100,fetchedAt:now}];s.team!.macroPolicy=true;s.team!.btcHour=structuredClone(frame);s.team!.hour={ETH:structuredClone(frame)};s.team!.atr15={ETH:{...frame,barTime:now-900000}};s.team!.spreads={ETH:{fraction:0,fetchedAt:now}};s.team!.news={source:'CoinDesk RSS',fetchedAt:now,headlines:[{title:'Bitcoin rises',url:'https://www.coindesk.com/test',publishedAt:now-1000}]};s.team!.research={'trend-pullback-v2':{ETH:{analysis:a,chart:{approved:true,reason:'Confirmed'}}}};return s}
+test('macro entry needs bullish BTC, positive news, aligned asset trend, volume, ATR and spread',()=>{
+ assert.equal(evaluateTeam(account(),now).candidates[0].approved,true);
+ for(const change of [(s:ReturnType<typeof account>)=>{s.team!.btcHour!.trend='BEARISH'},(s:ReturnType<typeof account>)=>{s.team!.news!.headlines[0].title='Bitcoin market update'},(s:ReturnType<typeof account>)=>{s.team!.hour!.ETH={...frame,trend:'BEARISH'}},(s:ReturnType<typeof account>)=>{s.team!.atr15=undefined},(s:ReturnType<typeof account>)=>{s.team!.spreads!.ETH.fraction=.002}]){const s=account();change(s);assert.equal(evaluateTeam(s,now).candidates[0].approved,false)}
+});
+test('ATR widens strategy stop and 3R plan mirrors long/short; excessive stops veto',()=>{
+ const f={...frame,barTime:now-900000,atr:.8};const long=volatilityAnalysis(a,f,100,now);assert.ok(Math.abs(long.stopFraction-1.2/100.05)<1e-8);const plan=entryPlan(100,long)!;assert.ok(Math.abs((plan.target-plan.entry)/(plan.entry-plan.stop)-3)<1e-8);
+ const short=entryPlan(100,volatilityAnalysis({...a,direction:'short'},f,100,now))!;assert.ok(Math.abs((short.entry-short.target)/(short.stop-short.entry)-3)<1e-8);assert.equal(volatilityAnalysis(a,{...f,atr:2},100,now).eligible,false);
+});
+test('higher frame rejects missing and stale history',()=>{assert.ok(higherFrame([],now,3600000).error);assert.equal(freshFrame({...frame,fetchedAt:now-120001},now,3600000),false)});
+test('higher-frame freshness remains valid between hourly closes',()=>{assert.equal(freshFrame({...frame,fetchedAt:now+1800000},now+1800000,3600000),true);assert.equal(freshFrame({...frame,fetchedAt:now+3600000},now+3600000,3600000),false)});
+test('strict scanner excludes named tokens and insufficient reported volume',()=>{const product=(symbol:string,vol:number)=>({product_id:symbol+'-USD',base_currency_id:symbol,quote_currency_id:'USD',product_type:'SPOT',status:'online',price:'100',volume_24h:'10000',approximate_quote_24h_volume:String(vol)});const ranked=rankLiquidPairs({products:[product('BTC',2000000),product('TRUMP',5000000),product('PENGU',5000000),product('THIN',999999)]},now,true);assert.deepEqual(ranked.pairs.map(p=>p.symbol),['BTC'])});
+test('existing 2R positions preserve target while new 3R positions continue beyond 2R',()=>{for(const r of [2,3]){const s=ensureTeam(initial());s.startedAt=now;s.dayBase=100000;s.cash=99000;s.positions=[{id:'p',symbol:'ETH',kind:'intraday',quantity:10,entry:100,mark:100,entryFee:0,openedAt:now,initialRisk:1,stop:99,target:100+r,...(r===3?{targetR:3}:{})}];advance(s,[{symbol:'ETH',price:102.2,fetchedAt:now+1000}],now+1000,'tick',undefined,()=>false,true);assert.equal(s.positions.length,r===3?1:0);if(r===3){assert.equal(s.positions[0].stop,101.5);assert.equal(s.positions[0].target,103)}}});
