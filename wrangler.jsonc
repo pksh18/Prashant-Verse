@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "prashant-verse",
+  "main": "build/cloudflare-worker.ts",
+  "compatibility_date": "2026-10-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "prashantverse-db",
+    "database_id": "24aeb285-4c53-4f68-a53d-482ea8c06877",
+    "migrations_dir": "drizzle"
+  }]
+}

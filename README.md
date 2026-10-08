@@ -1,3 +1,22 @@
+# PrashantVerse — GitHub / Cloudflare deployment
+
+This repository supports an independent Cloudflare Workers deployment. The existing Sites deployment is managed separately.
+
+- Build command: `npm run build:cloudflare`
+- Deploy command: `npm run deploy:cloudflare`
+- Production branch: `main`
+- Worker name: `prashant-verse`
+- D1 binding: `DB`, configured in `wrangler.jsonc`
+- Node.js: 22.13 or newer
+
+The Cloudflare version uses private, per-browser simulation portfolios. Choose **Open portfolio** to establish a secure HttpOnly browser session. Clearing cookies, changing browsers, or session expiry removes access to that browser portfolio; this is not a recoverable email/password account. Each visitor starts separately, and the old site's portfolio history is not migrated.
+
+Sessions store only hashed random tokens in D1. Public identity headers are stripped before authentication. Execution is simulated; no real broker orders are submitted. The current engine updates while the dashboard is open and does not become an always-on trading service merely by deploying it.
+
+For a different Cloudflare account, create a new D1 database, update its ID in `wrangler.jsonc`, and initialize the SQL tables in `drizzle/`. Never commit API tokens, browser session cookies, or account secrets.
+
+---
+
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {Button} from '@/components/ui/button';
